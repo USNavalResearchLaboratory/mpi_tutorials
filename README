@@ -16,6 +16,9 @@ A shell script has been provided (compile-all.sh) to compile all the example cod
 
 Several of these codes compile with warnings under gcc version 4.9.4 and likely other compiler versions. We have intentionally made no other changes to the code other than what is necessary to compile under a GNU/Linux environment and basic formatting adjustments. All changes between the original Deino source and the NRL-modified source are documented here in the patches subdirectory.
 
+This project includes a git repo and can be cloned via:
+  git clone </path/to/project>
+
 Contact Joel Bretheim or Sergio Tafur in Code 5594 with any questions:
   joel.bretheim@nrl.navy.mil
   sergio.tafur@nrl.navy.mil
