@@ -1,0 +1,22 @@
+U.S. Naval Research Laboratory
+
+The High Performance Computing group in Code 5594 has modified source code documentation (which includes code examples) demonstrating the Message Passing Interface (MPI). The original documentation is located in the documentation section of the DeinoMPI library and is currently freely available on the internet at www.mpi.deino.net/mpi_functions/. The MPI routines available on that webpage demonstrate MPI-2 function calls intended for a Microsoft Windows environment. We have slightly modified the documentation so that its code examples will run in GNU/Linux environments. We have also made other relatively minor modifications to the formatting of the code examples. We intend for this distribution to be available to NRL researchers as a source of reference in their parallel programming efforts.
+
+The original code was pulled down from the Deino website written above. The website has a copyright statement ("Copyright 2009 Deino Software. All rights reserved.'') footer. This statement has been appended to each source code file in the modified example codes along with a comment that includes a link to the original source website.
+
+There are 227 source code files demonstrating various MPI function calls. Not all MPI functions documented on the Deino MPI website can be found here as some of the functions have been deprecated and others did not have any code example provided.
+
+To compile and run on a GNU/Linux system where a MPI implementation has been installed:
+  mpicc <source_file.c> -o <executable_name>
+  mpirun -n 2 <executable_name>
+
+The above example is executed with two processes, however, some of the code examples require more than two processes to execute properly.
+
+A shell script has been provided (compile-all.sh) to compile all the example codes.
+
+Several of these codes compile with warnings under gcc version 4.9.4 and likely other compiler versions. We have intentionally made no other changes to the code other than what is necessary to compile under a GNU/Linux environment and basic formatting adjustments. All changes between the original Deino source and the NRL-modified source are documented here in the patches subdirectory.
+
+Contact Joel Bretheim or Sergio Tafur in Code 5594 with any questions:
+  joel.bretheim@nrl.navy.mil
+  sergio.tafur@nrl.navy.mil
+
