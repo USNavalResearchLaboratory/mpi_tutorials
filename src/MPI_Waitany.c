@@ -1,0 +1,151 @@
+/* 
+MPI_Waitany
+
+   Waits for any specified MPI Request to complete
+int MPI_Waitany(
+  int count,
+  MPI_Request array_of_requests[],
+  int *index,
+  MPI_Status *status
+);
+
+Parameters
+
+   count
+          [in] list length (integer)
+
+   array_of_requests
+          [in/out] array of requests (array of handles)
+
+   index
+          [out] index of handle for operation that completed (integer). In
+          the range 0 to count-1. In Fortran, the range is 1 to count.
+
+   status
+          [out] status object (Status). May be MPI_STATUS_IGNORE.
+
+Remarks
+
+   Blocks until one of the operations associated with the active requests
+   in the array has completed. If more then one operation is enabled and
+   can terminate, one is arbitrarily chosen. Returns in index the index of
+   that request in the array and returns in status the status of the
+   completing communication. (The array is indexed from zero in C, and
+   from one in Fortran.) If the request was allocated by a nonblocking
+   communication operation, then it is deallocated and the request handle
+   is set to MPI_REQUEST_NULL.
+
+   The array_of_requests list may contain null or inactive handles. If the
+   list contains no active handles (list has length zero or all entries
+   are null or inactive), then the call returns immediately with index =
+   MPI_UNDEFINED, and a empty status.
+
+   The execution of MPI_WAITANY(count, array_of_requests, index, status)
+   has the same effect as the execution of MPI_WAIT(&array_of_requests[i],
+   status), where i is the value returned by index (unless the value of
+   index is MPI_UNDEFINED). MPI_WAITANY with an array containing one
+   active entry is equivalent to MPI_WAIT.
+   If all of the requests are MPI_REQUEST_NULL, then index is returned as
+   MPI_UNDEFINED, and status is returned as an empty status.
+
+   While it is possible to list a request handle more than once in the
+   array_of_requests, such an action is considered erroneous and may cause
+   the program to unexecpectedly terminate or produce incorrect results.
+
+Note on status for send operations
+
+   For send operations, the only use of status is for MPI_Test_cancelled
+   or in the case that there is an error, in which case the MPI_ERROR
+   field of status will be set.
+
+Thread and Interrupt Safety
+
+   This routine is thread-safe. This means that this routine may be safely
+   used by multiple threads without the need for any user-provided thread
+   locks. However, the routine is not interrupt safe. Typically, this is
+   due to the use of memory allocation routines such as malloc or other
+   non-MPICH runtime routines that are themselves not interrupt-safe.
+
+Notes for Fortran
+
+   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
+   an additional argument ierr at the end of the argument list. ierr is an
+   integer and has the same meaning as the return value of the routine in
+   C. In Fortran, MPI routines are subroutines, and are invoked with the
+   call statement.
+
+   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
+   Fortran.
+
+Errors
+
+   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
+   value; C routines as the value of the function and Fortran routines in
+   the last argument. Before the value is returned, the current MPI error
+   handler is called. By default, this error handler aborts the MPI job.
+   The error handler may be changed with MPI_Comm_set_errhandler (for
+   communicators), MPI_File_set_errhandler (for files), and
+   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
+   MPI_Errhandler_set may be used but its use is deprecated. The
+   predefined error handler MPI_ERRORS_RETURN may be used to cause error
+   values to be returned. Note that MPI does not guarentee that an MPI
+   program can continue past an error; however, MPI implementations will
+   attempt to continue whenever possible.
+
+   MPI_SUCCESS
+          No error; MPI routine completed successfully.
+
+   MPI_ERR_REQUEST
+          Invalid MPI_Request. Either null or, in the case of a MPI_Start
+          or MPI_Startall, not a persistent request.
+
+   MPI_ERR_ARG
+          Invalid argument. Some argument is invalid and is not identified
+          by a specific error class (e.g., MPI_ERR_RANK).
+
+*/
+ 
+// Copyright 2009 Deino Software. All rights reserved.
+// Source: http://mpi.deino.net/mpi_functions/index.htm
+
+#include "mpi.h"
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    int rank, size;
+    int i, index;
+    int buffer[400];
+    MPI_Request request[4];
+    MPI_Status status[4];
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size != 4)
+    {
+        printf("Please run with 4 processes.\n");
+	fflush(stdout);
+        MPI_Finalize();
+        return 1;
+    }
+    
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank == 0) {
+      for (i=0; i<size * 100; i++) buffer[i] = i/100;
+        for (i=0; i<size-1; i++) {
+          MPI_Isend(&buffer[i*100], 100, MPI_INT, i+1, 123, MPI_COMM_WORLD, &request[i]);
+        }
+        for (i=0; i<size-1; i++) {
+          MPI_Waitany(size-1, request, &index, status);
+        }
+    }
+    else {
+      MPI_Recv(buffer, 100, MPI_INT, 0, 123, MPI_COMM_WORLD, &status[0]);
+      printf("%d: buffer[0] = %d\n", rank, buffer[0]);
+      fflush(stdout);
+    }
+    
+    MPI_Finalize();
+    return 0;
+}
+

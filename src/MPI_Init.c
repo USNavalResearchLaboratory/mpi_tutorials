@@ -1,0 +1,92 @@
+/* 
+MPI_Init
+
+   Initialize the MPI execution environment
+int MPI_Init(
+  int *argc,
+  char ***argv
+);
+
+int MPI_Init(
+  int *argc,
+  wchar_t ***argv
+);
+
+Parameters
+
+   argc
+          [in] Pointer to the number of arguments
+
+   argv
+          [in] Pointer to the argument vector
+
+Remarks
+
+   This routine must be called before any other MPI routine. It must be
+   called at most once; subsequent calls are erroneous (see
+   MPI_INITIALIZED).
+
+   The MPI standard does not say what a program can do before an MPI_INIT
+   or after an MPI_FINALIZE. In the MPICH implementation, you should do as
+   little as possible. In particular, avoid anything that changes the
+   external state of the program, such as opening files, reading standard
+   input or writing to standard output.
+
+Thread and Signal Safety
+
+   This routine must be called by one thread only. That thread is called
+   the main thread and must be the thread that calls MPI_Finalize.
+
+Notes for Fortran
+
+   The Fortran binding for MPI_Init has only the error return
+    subroutine MPI_INIT( ierr )
+    integer ierr
+
+Errors
+
+   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
+   value; C routines as the value of the function and Fortran routines in
+   the last argument. Before the value is returned, the current MPI error
+   handler is called. By default, this error handler aborts the MPI job.
+   The error handler may be changed with MPI_Comm_set_errhandler (for
+   communicators), MPI_File_set_errhandler (for files), and
+   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
+   MPI_Errhandler_set may be used but its use is deprecated. The
+   predefined error handler MPI_ERRORS_RETURN may be used to cause error
+   values to be returned. Note that MPI does not guarentee that an MPI
+   program can continue past an error; however, MPI implementations will
+   attempt to continue whenever possible.
+
+   MPI_SUCCESS
+          No error; MPI routine completed successfully.
+
+   MPI_ERR_OTHER
+          This error class is associated with an error code that indicates
+          that an attempt was made to call MPI_INIT a second time.
+          MPI_INIT may only be called once in a program.
+
+See Also
+
+   MPI_Init_thread, MPI_Finalize
+
+*/
+ 
+// Copyright 2009 Deino Software. All rights reserved.
+// Source: http://mpi.deino.net/mpi_functions/index.htm
+
+
+#include "mpi.h"
+#include <stdio.h>
+int main(int argc, char *argv[])
+{
+    int rank, nprocs;
+    MPI_Init(&argc,&argv);
+    MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+    printf("Hello, world.  I am %d of %d\n", rank,
+nprocs);fflush(stdout);
+    MPI_Finalize();
+    return 0;
+}
+

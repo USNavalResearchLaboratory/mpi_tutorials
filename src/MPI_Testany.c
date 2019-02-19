@@ -1,0 +1,167 @@
+/* 
+MPI_Testany
+
+   Tests for completion of any previdously initiated requests
+int MPI_Testany(
+  int count,
+  MPI_Request array_of_requests[],
+  int *index,
+  int *flag,
+  MPI_Status *status
+);
+
+Parameters
+
+   count
+          [in] list length (integer)
+
+   array_of_requests
+          [in] array of requests (array of handles)
+
+   index
+          [out] index of operation that completed, or MPI_UNDEFINED if
+          none completed (integer)
+
+   flag
+          [out] true if one of the operations is complete (logical)
+
+   status
+          [out] status object (Status). May be MPI_STATUS_IGNORE.
+
+Remarks
+
+   Tests for completion of either one or none of the operations associated
+   with active handles. In the former case, it returns flag = true,
+   returns in index the index of this request in the array, and returns in
+   status the status of that operation; if the request was allocated by a
+   nonblocking communication call then the request is deallocated and the
+   handle is set to MPI_REQUEST_NULL. (The array is indexed from zero in
+   C, and from one in Fortran.) In the latter case (no operation
+   completed), it returns flag = false, returns a value of MPI_UNDEFINED
+   in index and status is undefined.
+
+   The array may contain null or inactive handles. If the array contains
+   no active handles then the call returns immediately with flag = true,
+   index = MPI_UNDEFINED, and an empty status.
+
+   If the array of requests contains active handles then the execution of
+   MPI_TESTANY(count, array_of_requests, index, status) has the same
+   effect as the execution of MPI_TEST( &array_of_requests[i], flag,
+   status), for i=0, 1 ,..., count-1, in some arbitrary order, until one
+   call returns flag = true, or all fail. In the former case, index is set
+   to the last value of i, and in the latter case, it is set to
+   MPI_UNDEFINED. MPI_TESTANY with an array containing one active entry is
+   equivalent to MPI_TEST.
+
+   Rationale.
+
+   The function MPI_TESTANY returns with flag = true exactly in those
+   situations where the function MPI_WAITANY returns; both functions
+   return in that case the same values in the remaining parameters. Thus,
+   a blocking MPI_WAITANY can be easily replaced by a nonblocking
+   MPI_TESTANY. The same relation holds for the other pairs of Wait and
+   Test functions defined in this section.
+
+   While it is possible to list a request handle more than once in the
+   array_of_requests, such an action is considered erroneous and may cause
+   the program to unexecpectedly terminate or produce incorrect results.
+
+Thread and Interrupt Safety
+
+   This routine is thread-safe. This means that this routine may be safely
+   used by multiple threads without the need for any user-provided thread
+   locks. However, the routine is not interrupt safe. Typically, this is
+   due to the use of memory allocation routines such as malloc or other
+   non-MPICH runtime routines that are themselves not interrupt-safe.
+
+Note on status for send operations
+
+   For send operations, the only use of status is for MPI_Test_cancelled
+   or in the case that there is an error, in which case the MPI_ERROR
+   field of status will be set.
+
+Notes for Fortran
+
+   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
+   an additional argument ierr at the end of the argument list. ierr is an
+   integer and has the same meaning as the return value of the routine in
+   C. In Fortran, MPI routines are subroutines, and are invoked with the
+   call statement.
+
+   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
+   Fortran.
+
+Errors
+
+   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
+   value; C routines as the value of the function and Fortran routines in
+   the last argument. Before the value is returned, the current MPI error
+   handler is called. By default, this error handler aborts the MPI job.
+   The error handler may be changed with MPI_Comm_set_errhandler (for
+   communicators), MPI_File_set_errhandler (for files), and
+   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
+   MPI_Errhandler_set may be used but its use is deprecated. The
+   predefined error handler MPI_ERRORS_RETURN may be used to cause error
+   values to be returned. Note that MPI does not guarentee that an MPI
+   program can continue past an error; however, MPI implementations will
+   attempt to continue whenever possible.
+
+   MPI_SUCCESS
+          No error; MPI routine completed successfully.
+
+*/
+ 
+// Copyright 2009 Deino Software. All rights reserved.
+// Source: http://mpi.deino.net/mpi_functions/index.htm
+
+#include "mpi.h"
+#include <stdio.h>
+//#include <windows.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int rank, size, flag, i, index;
+    int buffer[100];
+    MPI_Request r[4];
+    MPI_Status status;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (size != 4)
+    {
+        printf("Please run with 4 processes.\n");
+	fflush(stdout);
+        MPI_Finalize();
+        return 1;
+    }
+
+    if (rank == 0)
+    {
+        for (i=1; i<size; i++)
+        {
+            MPI_Irecv(&buffer[i], 1, MPI_INT, i, 123, MPI_COMM_WORLD, &r[i-1]);
+        }
+        for (i=0; i<size-1; i++)
+        {
+            flag = 0;
+            MPI_Testany(size-1, r, &index, &flag, &status);
+            while (!flag)
+            {
+	        //Sleep(1);
+	        sleep(1);
+                MPI_Testany(size-1, r, &index, &flag, &status);
+            }
+            printf("%d finished\n", index+1);
+        }
+    }
+    else
+    {
+        MPI_Send(buffer, 1, MPI_INT, 0, 123, MPI_COMM_WORLD);
+    }
+    
+    MPI_Finalize();
+    return 0;
+}

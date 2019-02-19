@@ -1,0 +1,109 @@
+/* 
+MPI_Query_thread
+
+   Return the level of thread support provided by the MPI library
+int MPI_Query_thread(
+  int *provided
+);
+
+Parameters
+
+   provided
+          [out] Level of thread support provided. This is the same value
+          that was returned in the provided argument in MPI_Init_thread.
+
+Remarks
+
+   The valid values for the level of thread support are:
+
+   MPI_THREAD_SINGLE
+          Only one thread will execute.
+
+   MPI_THREAD_FUNNELED
+          The process may be multi-threaded, but only the main thread will
+          make MPI calls (all MPI calls are funneled to the main thread).
+
+   MPI_THREAD_SERIALIZED
+          The process may be multi-threaded, and multiple threads may make
+          MPI calls, but only one at a time: MPI calls are not made
+          concurrently from two distinct threads (all MPI calls are
+          serialized).
+
+   MPI_THREAD_MULTIPLE
+          Multiple threads may call MPI, with no restrictions.
+
+   If MPI_Init was called instead of MPI_Init_thread, the level of thread
+   support is defined by the implementation. This routine allows you to
+   find out the provided level. It is also useful for library routines
+   that discover that MPI has already been initialized and wish to
+   determine what level of thread support is available.
+
+Thread and Interrupt Safety
+
+   This routine is both thread- and interrupt-safe. This means that this
+   routine may safely be used by multiple threads and from within a signal
+   handler.
+
+Notes for Fortran
+
+   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
+   an additional argument ierr at the end of the argument list. ierr is an
+   integer and has the same meaning as the return value of the routine in
+   C. In Fortran, MPI routines are subroutines, and are invoked with the
+   call statement.
+
+   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
+   Fortran.
+
+Errors
+
+   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
+   value; C routines as the value of the function and Fortran routines in
+   the last argument. Before the value is returned, the current MPI error
+   handler is called. By default, this error handler aborts the MPI job.
+   The error handler may be changed with MPI_Comm_set_errhandler (for
+   communicators), MPI_File_set_errhandler (for files), and
+   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
+   MPI_Errhandler_set may be used but its use is deprecated. The
+   predefined error handler MPI_ERRORS_RETURN may be used to cause error
+   values to be returned. Note that MPI does not guarentee that an MPI
+   program can continue past an error; however, MPI implementations will
+   attempt to continue whenever possible.
+
+   MPI_SUCCESS
+          No error; MPI routine completed successfully.
+
+*/
+ 
+// Copyright 2009 Deino Software. All rights reserved.
+// Source: http://mpi.deino.net/mpi_functions/index.htm
+
+#include "mpi.h"
+#include <stdio.h>
+
+int main( int argc, char *argv[] )
+{
+    int errs = 0;
+    int provided, flag, claimed;
+
+    MPI_Init_thread( 0, 0, MPI_THREAD_MULTIPLE, &provided );
+
+    MPI_Is_thread_main( &flag );
+    if (!flag) {
+        errs++;
+        printf( "This thread called init_thread but Is_thread_main gave false\n" );
+	fflush(stdout);
+    }
+    
+    MPI_Query_thread( &claimed );
+    if (claimed != provided) {
+        errs++;
+        printf( "Query thread gave thread level %d but Init_thread gave %d\n",
+		claimed, provided );
+	fflush(stdout);
+    }
+
+    MPI_Finalize();
+    return errs;
+}
+
