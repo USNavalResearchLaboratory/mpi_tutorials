@@ -1,0 +1,87 @@
+--- ./orig/MPI_Win_post.c	2019-02-19 13:52:59.000000001 -0500
++++ ./src/MPI_Win_post.c	2019-01-08 11:09:50.000000001 -0500
+@@ -1,3 +1,84 @@
++/* 
++MPI_Win_post
++
++   Start an RMA exposure epoch
++int MPI_Win_post(
++  MPI_Group group,
++  int assert,
++  MPI_Win win
++);
++
++Parameters
++
++   group
++          [in] group of origin processes (handle)
++
++   assert
++          [in] Used to optimize this call; zero may be used as a default.
++          See notes. (integer)
++
++   win
++          [in] window object (handle)
++
++Remarks
++
++   Starts an RMA exposure epoch for the local window associated with win.
++   Only processes in group should access the window with RMA calls on win
++   during this epoch. Each process in group must issue a matching call to
++   MPI_WIN_START. MPI_WIN_POST does not block.
++   The assert argument is used to indicate special conditions for the
++   fence that an implementation may use to optimize the MPI_Win_post
++   operation. The value zero is always correct. Other assertion values may
++   be or'ed together. Assertions that are valid for MPI_Win_post are:
++
++   MPI_MODE_NOCHECK
++          the matching calls to MPI_WIN_START have not yet occurred on any
++          origin processes when the call to MPI_WIN_POST is made. The
++          nocheck option can be specified by a post call if and only if it
++          is specified by each matching start call.
++
++   MPI_MODE_NOSTORE
++          the local window was not updated by local stores (or local get
++          or receive calls) since last synchronization. This may avoid the
++          need for cache synchronization at the post call.
++
++   MPI_MODE_NOPUT
++          the local window will not be updated by put or accumulate calls
++          after the post call, until the ensuing (wait) synchronization.
++          This may avoid the need for cache synchronization at the wait
++          call.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

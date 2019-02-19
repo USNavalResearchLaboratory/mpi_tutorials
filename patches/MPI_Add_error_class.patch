@@ -1,0 +1,120 @@
+--- ./orig/MPI_Add_error_class.c	2019-02-19 13:52:57.000000001 -0500
++++ ./src/MPI_Add_error_class.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,117 @@
++/* 
++MPI_Add_error_class
++
++   Add an MPI error class to the known classes
++int MPI_Add_error_class(
++  int *errorclass
++);
++
++Parameters
++
++   errorclass
++          [out] New error class
++
++Remarks
++
++   Creates a new error class and returns the value for it.
++
++   Rationale: To avoid conflicts with existing error codes and classes,
++   the value is set by the implementation and not by the user.
++
++   Users may want to write a layered library on top of an existing MPI
++   implementation, and this library may have its own set of error codes
++   and classes. An example of such a library is an I/O library based on
++   the I/O chapter in MPI-2. For this purpose, functions are needed to:
++   1. add a new error class to the ones an MPI implementation already
++       knows.
++       2. associate error codes with this error class, so that
++       MPI_ERROR_CLASS works.
++       3. associate strings with these error codes, so that
++       MPI_ERROR_STRING works.
++       4. invoke the error handler associated with a communicator, window,
++       or object.
++
++   Several new functions are provided to do this. They are all local. No
++   functions are provided to free error handlers or error classes: it is
++   not expected that an application will generate them in significant
++   numbers.
++
++   Advice to users.
++
++   Since a call to MPI_ADD_ERROR_CLASS is local, the same errorclass may
++   not be returned on all processes that make this call. Thus, it is not
++   safe to assume that registering a new error on a set of processes at
++   the same time will yield the same errorclass on all of the processes.
++   However, if an implementation returns the new errorclass in a
++   deterministic way, and they are always generated in the same order on
++   the same set of processes (for example, all processes), then the value
++   will be the same. However, even if a deterministic algorithm is used,
++   the value can vary across processes. This can happen, for example, if
++   different but overlapping groups of processes make a series of calls.
++   As a result of these issues, getting the "same" error on multiple
++   processes may not cause the same value of error code to be generated. (
++   End of advice to users.)
++   The value of MPI_ERR_LASTCODE is not affected by new user-defined error
++   codes and classes. As in MPI-1, it is a constant value. Instead, a
++   predefined attribute key MPI_LASTUSEDCODE is associated with
++   MPI_COMM_WORLD. The attribute value corresponding to this key is the
++   current maximum error class including the user-defined ones. This is a
++   local value and may be different on different processes. The value
++   returned by this key is always greater than or equal to
++   MPI_ERR_LASTCODE.
++
++   Advice to users.
++
++   The value returned by the key MPI_LASTUSEDCODE will not change unless
++   the user calls a function to explicitly add an error class/code. In a
++   multi-threaded environment, the user must take extra care in assuming
++   this value has not changed. Note that error codes and error classes are
++   not necessarily dense. A user may not assume that each error class
++   below MPI_LASTUSEDCODE is valid.
++
++Thread and Interrupt Safety
++
++   This routine is thread-safe. This means that this routine may be safely
++   used by multiple threads without the need for any user-provided thread
++   locks. However, the routine is not interrupt safe. Typically, this is
++   due to the use of memory allocation routines such as malloc or other
++   non-MPICH runtime routines that are themselves not interrupt-safe.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_OTHER
++          Other error; use MPI_Error_string to get more information about
++          this error code.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

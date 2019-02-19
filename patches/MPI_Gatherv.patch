@@ -1,0 +1,159 @@
+--- ./orig/MPI_Gatherv.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_Gatherv.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,156 @@
++/* 
++MPI_Gatherv
++
++   Gathers into specified locations from all processes in a group
++int MPI_Gatherv(
++  void *sendbuf,
++  int sendcnt,
++  MPI_Datatype sendtype,
++  void *recvbuf,
++  int *recvcnts,
++  int *displs,
++  MPI_Datatype recvtype,
++  int root,
++  MPI_Comm comm
++);
++
++Parameters
++
++   sendbuf
++          [in] starting address of send buffer (choice)
++
++   sendcount
++          [in] number of elements in send buffer (integer)
++
++   sendtype
++          [in] data type of send buffer elements (handle)
++
++   recvbuf
++          [out] address of receive buffer (choice, significant only at
++          root)
++
++   recvcounts
++          [in] integer array (of length group size) containing the number
++          of elements that are received from each process (significant
++          only at root)
++
++   displs
++          [in] integer array (of length group size). Entry i specifies the
++          displacement relative to recvbuf at which to place the incoming
++          data from process i (significant only at root)
++
++   recvtype
++          [in] data type of recv buffer elements (significant only at
++          root) (handle)
++
++   root
++          [in] rank of receiving process (integer)
++
++   comm
++          [in] communicator (handle)
++
++Remarks
++
++   MPI_GATHERV extends the functionality of MPI_GATHER by allowing a
++   varying count of data from each process, since recvcounts is now an
++   array. It also allows more flexibility as to where the data is placed
++   on the root, by providing the new argument, displs.
++
++   The outcome is as if each process, including the root process, sends a
++   message to the root,
++
++   [img106.gif]
++
++   and the root executes n receives,
++
++   [img107.gif]
++
++   The data received from process j is placed into recvbuf of the root
++   process beginning at offset displs[j] elements (in terms of the
++   recvtype).
++
++   The receive buffer is ignored for all non-root processes.
++
++   The type signature implied by sendcount, sendtype on process i must be
++   equal to the type signature implied by recvcounts[i], recvtype at the
++   root. This implies that the amount of data sent must be equal to the
++   amount of data received, pairwise between each process and the root.
++   Distinct type maps between sender and receiver are still allowed.
++
++   All arguments to the function are significant on process root, while on
++   other processes, only arguments sendbuf, sendcount, sendtype, root,
++   comm are significant. The arguments root and comm must have identical
++   values on all processes.
++
++   The specification of counts, types, and displacements should not cause
++   any location on the root to be written more than once. Such a call is
++   erroneous.
++
++   The "in place" option for intracommunicators is specified by passing
++   MPI_IN_PLACE as the value of sendbuf at the root. In such a case,
++   sendcount and sendtype are ignored, and the contribution of the root to
++   the gathered vector is assumed to be already in the correct place in
++   the receive buffer
++
++   If comm is an intercommunicator, then the call involves all processes
++   in the intercommunicator, but with one group (group A) defining the
++   root process. All processes in the other group (group B) pass the same
++   value in argument root, which is the rank of the root in group A. The
++   root passes the value MPI_ROOT in root. All other processes in group A
++   pass the value MPI_PROC_NULL in root. Data is gathered from all
++   processes in group B to the root. The send buffer arguments of the
++   processes in group B must be consistent with the receive buffer
++   argument of the root.
++
++Thread and Interrupt Safety
++
++   This routine is thread-safe. This means that this routine may be safely
++   used by multiple threads without the need for any user-provided thread
++   locks. However, the routine is not interrupt safe. Typically, this is
++   due to the use of memory allocation routines such as malloc or other
++   non-MPICH runtime routines that are themselves not interrupt-safe.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement. All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of
++   type INTEGER in Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_COMM
++          Invalid communicator. A common error is to use a null
++          communicator in a call (not even allowed in MPI_Comm_rank).
++
++   MPI_ERR_TYPE
++          Invalid datatype argument. May be an uncommitted MPI_Datatype
++          (see MPI_Type_commit).
++
++   MPI_ERR_BUFFER
++          Invalid buffer pointer. Usually a null buffer where one is not
++          valid.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

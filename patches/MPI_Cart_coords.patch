@@ -1,0 +1,93 @@
+--- ./orig/MPI_Cart_coords.c	2019-02-19 13:52:57.000000001 -0500
++++ ./src/MPI_Cart_coords.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,90 @@
++/* 
++MPI_Cart_coords
++
++   Determines process coords in cartesian topology given rank in group
++int MPI_Cart_coords(
++  MPI_Comm comm,
++  int rank,
++  int maxdims,
++  int *coords
++);
++
++Parameters
++
++   comm
++          [in] communicator with cartesian structure (handle)
++
++   rank
++          [in] rank of a process within group of comm (integer)
++
++   maxdims
++          [in] length of vector coords in the calling program (integer)
++
++   coords
++          [out] integer array (of size ndims) containing the Cartesian
++          coordinates of specified process (integer)
++
++Remarks
++
++   The inverse mapping, rank-to-coordinates translation is provided by
++   MPI_CART_COORDS.
++
++Thread and Interrupt Safety
++
++   This routine is both thread- and interrupt-safe. This means that this
++   routine may safely be used by multiple threads and from within a signal
++   handler.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_TOPOLOGY
++          Invalid topology. Either there is no topology associated with
++          this communicator, or it is not the correct type (e.g., MPI_CART
++          when expecting MPI_GRAPH).
++
++   MPI_ERR_RANK
++          Invalid source or destination rank. Ranks must be between zero
++          and the size of the communicator minus one; ranks in a receive
++          (MPI_Recv, MPI_Irecv, MPI_Sendrecv, etc.) may also be
++          MPI_ANY_SOURCE.
++
++   MPI_ERR_DIMS
++          Invalid dimension argument. A dimension argument is null or its
++          length is less than or equal to zero.
++
++   MPI_ERR_ARG
++          Invalid argument. Some argument is invalid and is not identified
++          by a specific error class (e.g., MPI_ERR_RANK).
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

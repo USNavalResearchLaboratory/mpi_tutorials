@@ -1,0 +1,82 @@
+--- ./orig/MPI_Error_class.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_Error_class.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,79 @@
++/* 
++MPI_Error_class
++
++   Converts an error code into an error class
++int MPI_Error_class(
++  int errorcode,
++  int *errorclass
++);
++
++Parameters
++
++   errorcode
++          [in] Error code returned by an MPI routine
++
++   errorclass
++          [out] Error class associated with errorcode
++
++Remarks
++
++   The error codes returned by MPI are left entirely to the implementation
++   (with the exception of MPI_SUCCESS). This is done to allow an
++   implementation to provide as much information as possible in the error
++   code (for use with MPI_ERROR_STRING).
++
++   To make it possible for an application to interpret an error code, the
++   routine MPI_ERROR_CLASS converts any error code into one of a small set
++   of standard error codes, called error classes. Valid error classes
++   include
++
++   [img194.gif]
++
++   The error classes are a subset of the error codes: an MPI function may
++   return an error class number; and the function MPI_ERROR_STRING can be
++   used to compute the error string associated with an error class.
++
++   The error codes satisfy,
++
++   [img195.gif]
++
++Thread and Interrupt Safety
++
++   This routine is both thread- and interrupt-safe. This means that this
++   routine may safely be used by multiple threads and from within a signal
++   handler.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

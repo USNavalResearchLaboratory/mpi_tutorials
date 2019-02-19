@@ -1,0 +1,87 @@
+--- ./orig/MPI_Type_set_name.c	2019-02-19 14:52:11.000000001 -0500
++++ ./src/MPI_Type_set_name.c	2019-01-08 11:09:50.000000001 -0500
+@@ -1,3 +1,75 @@
++/* 
++MPI_Type_set_name
++
++   set datatype name
++int MPI_Type_set_name(
++  MPI_Datatype type,
++  char *type_name
++);
++
++int MPI_Type_set_name(
++  MPI_Datatype type,
++  wchar_t *type_name
++);
++
++Parameters
++
++   type
++          [in] datatype whose identifier is to be set (handle)
++
++   type_name
++          [in] the character string which is remembered as the name
++          (string)
++
++Remarks
++
++   Set the name associated with a datatype.  The parameter type_name must
++   not be longer than MPI_MAX_OBJECT_NAME characters including the NULL
++   terminator.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_ARG
++          Invalid argument. Some argument is invalid and is not identified
++          by a specific error class (e.g., MPI_ERR_RANK).
++
++   MPI_ERR_TYPE
++          Invalid datatype argument. May be an uncommitted MPI_Datatype
++          (see MPI_Type_commit).
++
++   MPI_ERR_OTHER
++          Other error; use MPI_Error_string to get more information about
++          this error code.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 
+@@ -59,7 +131,7 @@
+     { MPI_INTEGER2, "MPI_INTEGER2" },
+     { MPI_INTEGER4, "MPI_INTEGER4" },
+     { MPI_INTEGER8, "MPI_INTEGER8" },
+-    { MPI_INTEGER16, "MPI_INTEGER16" },
++    //{ MPI_INTEGER16, "MPI_INTEGER16" },   // won't compile with this one
+     { 0, (char *)0 }, /* Sentinal used to indicate the last element */
+ };
+ 

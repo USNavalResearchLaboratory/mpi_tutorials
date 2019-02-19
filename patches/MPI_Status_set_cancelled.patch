@@ -1,0 +1,72 @@
+--- ./orig/MPI_Status_set_cancelled.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_Status_set_cancelled.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,69 @@
++/* 
++MPI_Status_set_cancelled
++
++   Sets the cancelled state associated with a Status object
++int MPI_Status_set_cancelled(
++  MPI_Status *status,
++  int flag
++);
++
++Parameters
++
++   status
++          [in] status to associate cancel flag with (Status)
++
++   flag
++          [in] if true indicates request was cancelled (logical)
++
++Remarks
++
++   If flag is set to true then a subsequent call to
++   MPI_TEST_CANCELLED(status, flag) will also return flag = true,
++   otherwise it will return false.
++
++Thread and Interrupt Safety
++
++   This routine is thread-safe. This means that this routine may be safely
++   used by multiple threads without the need for any user-provided thread
++   locks. However, the routine is not interrupt safe. Typically, this is
++   due to the use of memory allocation routines such as malloc or other
++   non-MPICH runtime routines that are themselves not interrupt-safe.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_ARG
++          Invalid argument. Some argument is invalid and is not identified
++          by a specific error class (e.g., MPI_ERR_RANK).
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

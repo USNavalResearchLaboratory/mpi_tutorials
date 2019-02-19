@@ -1,0 +1,135 @@
+--- ./orig/MPI_Alltoall.c	2019-02-19 13:52:57.000000001 -0500
++++ ./src/MPI_Alltoall.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,132 @@
++/* 
++MPI_Alltoall
++
++   Sends data from all to all processes
++int MPI_Alltoall(
++  void *sendbuf,
++  int sendcount,
++  MPI_Datatype sendtype,
++  void *recvbuf,
++  int recvcount,
++  MPI_Datatype recvtype,
++  MPI_Comm comm
++);
++
++Parameters
++
++   sendbuf
++          [in] starting address of send buffer (choice)
++
++   sendcount
++          [in] number of elements to send to each process (integer)
++
++   sendtype
++          [in] data type of send buffer elements (handle)
++
++        recvbuf
++                [out] address of receive buffer (choice)
++
++   recvcount
++          [in] number of elements received from any process (integer)
++
++   recvtype
++          [in] data type of receive buffer elements (handle)
++
++   comm
++          [in] communicator (handle)
++
++Remarks
++
++   MPI_ALLTOALL is an extension of MPI_ALLGATHER to the case where each
++   process sends distinct data to each of the receivers. The jth block
++   sent from process i is received by process j and is placed in the ith
++   block of recvbuf.
++
++   The type signature associated with sendcount, sendtype, at a process
++   must be equal to the type signature associated with recvcount, recvtype
++   at any other process. This implies that the amount of data sent must be
++   equal to the amount of data received, pairwise between every pair of
++   processes. As usual, however, the type maps may be different.
++
++   The outcome is as if each process executed a send to each process
++   (itself included) with a call to,
++
++   [img119.gif]
++
++   and a receive from every other process with a call to,
++
++   [img120.gif]
++
++   All arguments on all processes are significant. The argument comm must
++   have identical values on all processes.
++
++   No "in place" option is supported.
++
++   If comm is an intercommunicator, then the outcome is as if each process
++   in group A sends a message to each process in group B, and vice versa.
++   The j-th send buffer of process i in group A should be consistent with
++   the i-th receive buffer of process j in group B, and vice versa.
++
++   Advice to users.
++
++   When all-to-all is executed on an intercommunication domain, then the
++   number of data items sent from processes in group A to processes in
++   group B need not equal the number of items sent in the reverse
++   direction. In particular, one can have unidirectional communication by
++   specifying sendcount = 0 in the reverse direction.
++
++Thread and Interrupt Safety
++
++   This routine is thread-safe. This means that this routine may be safely
++   used by multiple threads without the need for any user-provided thread
++   locks. However, the routine is not interrupt safe. Typically, this is
++   due to the use of memory allocation routines such as malloc or other
++   non-MPICH runtime routines that are themselves not interrupt-safe.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_ERR_COMM
++          Invalid communicator. A common error is to use a null
++          communicator in a call (not even allowed in MPI_Comm_rank).
++
++   MPI_ERR_COUNT
++          Invalid count argument. Count arguments must be non-negative; a
++          count of zero is often valid.
++
++   MPI_ERR_TYPE
++          Invalid datatype argument. May be an uncommitted MPI_Datatype
++          (see MPI_Type_commit).
++
++   MPI_ERR_BUFFER
++          Invalid buffer pointer. Usually a null buffer where one is not
++          valid.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

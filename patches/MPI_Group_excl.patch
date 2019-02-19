@@ -1,0 +1,107 @@
+--- ./orig/MPI_Group_excl.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_Group_excl.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,104 @@
++/* 
++MPI_Group_excl
++
++   Produces a group by reordering an existing group and taking only
++   unlisted members
++int MPI_Group_excl(
++  MPI_Group group,
++  int n,
++  int *ranks,
++  MPI_Group *newgroup
++);
++
++Parameters
++
++   group
++          [in] group (handle)
++
++   n
++          [in] number of elements in array ranks (integer)
++
++   ranks
++          [in] array of integer ranks in group not to appear in newgroup
++
++   newgroup
++          [out] new group derived from above, preserving the order defined
++          by group (handle)
++
++Remarks
++
++   The function MPI_GROUP_EXCL creates a group of processes newgroup that
++   is obtained by deleting from group those processes with ranks ranks[0]
++   , [img143.gif] ranks[n-1]. The ordering of processes in newgroup is
++   identical to the ordering in group. Each of the n elements of ranks
++   must be a valid rank in group and all elements must be distinct;
++   otherwise, the program is erroneous. If n~=~0, then newgroup is
++   identical to group.
++
++   The MPI standard requires that each of the ranks to excluded must be a
++   valid rank in the group and all elements must be distinct or the
++   function is erroneous.
++
++Thread and Interrupt Safety
++
++   This routine is thread-safe. This means that this routine may be safely
++   used by multiple threads without the need for any user-provided thread
++   locks. However, the routine is not interrupt safe. Typically, this is
++   due to the use of memory allocation routines such as malloc or other
++   non-MPICH runtime routines that are themselves not interrupt-safe.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_GROUP
++          Null or invalid group passed to function.
++
++   MPI_ERR_INTERN
++          This error is returned when some part of the MPICH
++          implementation is unable to acquire memory.
++
++   MPI_ERR_ARG
++          Invalid argument. Some argument is invalid and is not identified
++          by a specific error class (e.g., MPI_ERR_RANK).
++
++   MPI_ERR_RANK
++          Invalid source or destination rank. Ranks must be between zero
++          and the size of the communicator minus one; ranks in a receive
++          (MPI_Recv, MPI_Irecv, MPI_Sendrecv, etc.) may also be
++          MPI_ANY_SOURCE.
++
++See Also
++
++   MPI_Group_free
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

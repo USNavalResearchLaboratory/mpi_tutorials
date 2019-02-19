@@ -1,0 +1,108 @@
+--- ./orig/MPI_Intercomm_merge.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_Intercomm_merge.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,105 @@
++/* 
++MPI_Intercomm_merge
++
++   Creates an intracommuncator from an intercommunicator
++int MPI_Intercomm_merge(
++  MPI_Comm intercomm,
++  int high,
++  MPI_Comm *newintracomm
++);
++
++Parameters
++
++   comm
++          [in] Intercommunicator (handle)
++
++   high
++          [in] Used to order the groups within comm (logical) when
++          creating the new communicator. This is a boolean value; the
++          group that sets high true has its processes ordered after the
++          group that sets this value to false. If all processes in the
++          intercommunicator provide the same value, the choice of which
++          group is ordered first is arbitrary.
++
++   comm_out
++          [out] Created intracommunicator (handle)
++
++Remarks
++
++   This function creates an intra-communicator from the union of the two
++   groups that are associated with intercomm. All processes should provide
++   the same high value within each of the two groups. If processes in one
++   group provided the value high = false and processes in the other group
++   provided the value high = true then the union orders the "low" group
++   before the "high" group. If all processes provided the same high
++   argument then the order of the union is arbitrary. This call is
++   blocking and collective within the union of the two groups.
++
++   While all processes may provide the same value for the high parameter,
++   this requires the MPI implementation to determine which group of
++   processes should be ranked first. The MPICH implementation uses various
++   techniques to determine which group should go first, but there is a
++   possibility that the implementation will be unable to break the tie.
++   Robust applications should avoid using the same value for high in both
++   groups.
++
++Thread and Interrupt Safety
++
++   This routine is thread-safe. This means that this routine may be safely
++   used by multiple threads without the need for any user-provided thread
++   locks. However, the routine is not interrupt safe. Typically, this is
++   due to the use of memory allocation routines such as malloc or other
++   non-MPICH runtime routines that are themselves not interrupt-safe.
++
++Notes for Fortran
++
++   All MPI routines in Fortran (except for MPI_WTIME and MPI_WTICK) have
++   an additional argument ierr at the end of the argument list. ierr is an
++   integer and has the same meaning as the return value of the routine in
++   C. In Fortran, MPI routines are subroutines, and are invoked with the
++   call statement.
++
++   All MPI objects (e.g., MPI_Datatype, MPI_Comm) are of type INTEGER in
++   Fortran.
++
++Algorithm
++
++   s Allocate contexts Local and remote group leaders swap high values
++   Determine the high value. Merge the two groups and make the
++   intra-communicator e
++
++Errors
++
++   All MPI routines (except MPI_Wtime and MPI_Wtick) return an error
++   value; C routines as the value of the function and Fortran routines in
++   the last argument. Before the value is returned, the current MPI error
++   handler is called. By default, this error handler aborts the MPI job.
++   The error handler may be changed with MPI_Comm_set_errhandler (for
++   communicators), MPI_File_set_errhandler (for files), and
++   MPI_Win_set_errhandler (for RMA windows). The MPI-1 routine
++   MPI_Errhandler_set may be used but its use is deprecated. The
++   predefined error handler MPI_ERRORS_RETURN may be used to cause error
++   values to be returned. Note that MPI does not guarentee that an MPI
++   program can continue past an error; however, MPI implementations will
++   attempt to continue whenever possible.
++
++   MPI_SUCCESS
++          No error; MPI routine completed successfully.
++
++   MPI_ERR_COMM
++          Invalid communicator. A common error is to use a null
++          communicator in a call (not even allowed in MPI_Comm_rank).
++
++   MPI_ERR_INTERN
++          This error is returned when some part of the MPICH
++          implementation is unable to acquire memory.
++
++See Also
++
++   MPI_Intercomm_create, MPI_Comm_free
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

@@ -1,0 +1,61 @@
+--- ./orig/MPI_File_iread.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_File_iread.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,58 @@
++/* 
++MPI_File_iread
++
++   Nonblocking read using individual file pointer
++int MPI_File_iread(
++  MPI_File mpi_fh,
++  void *buf,
++  int count,
++  MPI_Datatype datatype,
++  MPI_Request *request
++);
++
++Parameters
++
++   mpi_fh
++          [in] file handle (handle)
++
++   buf
++          [out] initial address of buffer (choice)
++
++   count
++          [in] number of elements in buffer (nonnegative integer)
++
++   datatype
++          [in] datatype of each buffer element (handle)
++
++   request
++          [out] request object (handle)
++
++Remarks
++
++   MPI_FILE_IREAD is a nonblocking version of the MPI_FILE_READ interface.
++
++   MPI maintains one individual file pointer per process per file handle.
++   The current value of this pointer implicitly specifies the offset in
++   the data access routines described in this section. These routines only
++   use and update the individual file pointers maintained by MPI. The
++   shared file pointer is not used nor updated.
++
++   The individual file pointer routines have the same semantics as the
++   data access with explicit offset routines with the following
++   modification:
++     * the offset is defined to be the current value of the MPI-maintained
++       individual file pointer.
++
++   After an individual file pointer operation is initiated, the individual
++   file pointer is updated to point to the next etype after the last one
++   that will be accessed. The file pointer is updated relative to the
++   current view of the file.
++
++   If MPI_MODE_SEQUENTIAL mode was specified when the file was opened, it
++   is erroneous to call the routine.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 

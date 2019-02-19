@@ -1,0 +1,47 @@
+--- ./orig/MPI_File_iwrite_at.c	2019-02-19 13:52:58.000000001 -0500
++++ ./src/MPI_File_iwrite_at.c	2019-01-08 11:09:49.000000001 -0500
+@@ -1,3 +1,44 @@
++/* 
++MPI_File_iwrite_at
++
++   Nonblocking write using explict offset
++int MPI_File_iwrite_at(
++  MPI_File mpi_fh,
++  MPI_Offset offset,
++  void *buf,
++  int count,
++  MPI_Datatype datatype,
++  MPI_Request *request
++);
++
++Parameters
++
++   fh
++          [in] file handle (handle)
++
++   offset
++          [in] file offset (nonnegative integer)
++
++   buf
++          [in] initial address of buffer (choice)
++
++   count
++          [in] number of elements in buffer (nonnegative integer)
++
++   datatype
++          [in] datatype of each buffer element (handle)
++
++   request
++          [out] request object (handle)
++
++Remarks
++
++   MPI_FILE_IWRITE_AT is a nonblocking version of the MPI_FILE_WRITE_AT
++   interface. MPI_FILE_WRITE_AT writes a file beginning at the position
++   specified by offset.
++
++*/
++ 
+ // Copyright 2009 Deino Software. All rights reserved.
+ // Source: http://mpi.deino.net/mpi_functions/index.htm
+ 
